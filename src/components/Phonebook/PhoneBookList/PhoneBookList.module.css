@@ -1,0 +1,46 @@
+.PhoneBookList__list {
+  font-family: Nunito;
+  width: 450px;
+}
+
+.PhoneBookList__item {
+  display: flex;
+  padding: 5px;
+  align-items: center;
+  height: 40px;
+}
+
+.PhoneBookList__btn {
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+.PhoneBookList__btn:focus,
+.PhoneBookList__btn:hover {
+  color: #ff0000f4;
+}
+
+.PhoneBookList__item:not(:last-child) {
+  border-bottom: 1px solid rgba(160, 215, 255, 0.659);
+}
+
+.Form__icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+.Contacts__name {
+  width: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.Contacts__phone {
+  width: 190px;
+  display: flex;
+  align-items: center;
+}
