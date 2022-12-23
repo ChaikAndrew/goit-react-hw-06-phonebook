@@ -3,29 +3,35 @@ import PhoneBookList from './Phonebook/PhoneBookList/PhoneBookList';
 import PhoneBookEditor from './Phonebook/PhoneBookEditor/PhoneBookEditor';
 import Filter from './Phonebook/PhoneBookFilter/PhoneBookFilter';
 import shortid from 'shortid';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import s from './Container.module.css';
 import { customToast } from './helper';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import * as contactActions from '../redux/contacts';
 
 export default function App() {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
+  const contacts = useSelector(state => state.contacts.items);
+  const filter = useSelector(state => state.contacts.filter);
+  console.log('filter ==>', filter);
 
-  useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    if (parsedContacts) {
-      setContacts(parsedContacts);
-    }
-  }, []);
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   const contacts = localStorage.getItem('contacts');
+  //   const parsedContacts = JSON.parse(contacts);
+  //   if (parsedContacts) {
+  //     setContacts(parsedContacts);
+  //   }
+  // }, []);
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  const addContact = (name, number) => {
+  const addContacts = (name, number) => {
     const findName = contacts.find(contact => contact.name === name);
 
     if (name === '') {
@@ -50,7 +56,7 @@ export default function App() {
         number,
       };
 
-      setContacts([contact, ...contacts]);
+      dispatch(contactActions.add(contact));
       customToast(`Contact "${name}" has been add`, 'success');
     }
   };
@@ -59,12 +65,12 @@ export default function App() {
     const updatedCoontacts = contacts.filter(
       contact => contact.id !== contactsListId
     );
-    setContacts(updatedCoontacts);
+    dispatch(contactActions.remove(updatedCoontacts));
     customToast(`Contact has been deleted`, 'success');
   };
 
   const changeFilter = e => {
-    setFilter(e.currentTarget.value);
+    dispatch(contactActions.filter(e.currentTarget.value));
   };
 
   const normalizedFilter = filter.toLowerCase();
@@ -75,7 +81,7 @@ export default function App() {
   return (
     <div className={s.Phonebook__container}>
       <h1 className={s.Phonebook__title}>PhoneBook</h1>
-      <PhoneBookEditor onSubmit={addContact} />
+      <PhoneBookEditor onSubmit={addContacts} />
 
       {contacts.length > 0 ? (
         <>
