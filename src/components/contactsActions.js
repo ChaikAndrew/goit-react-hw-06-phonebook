@@ -1,5 +1,3 @@
-// contactsActions.js
-
 import { useSelector, useDispatch } from 'react-redux';
 import { addContacts, deletePhoneBook, changeFilter } from './contactsUtils';
 import { customToast } from './helper';
