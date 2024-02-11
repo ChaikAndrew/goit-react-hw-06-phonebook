@@ -1,88 +1,41 @@
 import React from 'react';
-import PhoneBookList from './Phonebook/PhoneBookList/PhoneBookList';
-import PhoneBookEditor from './Phonebook/PhoneBookEditor/PhoneBookEditor';
-import Filter from './Phonebook/PhoneBookFilter/PhoneBookFilter';
-import shortid from 'shortid';
+import { useContacts } from './contactsActions';
 import s from './Container.module.css';
-import { customToast } from './helper';
-import { useSelector, useDispatch } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor } from '../../src/redux/index';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { PersistGate } from 'redux-persist/integration/react';
-import { persistor } from '../../src/redux/index';
-
-import * as contactActions from '../redux/contacts';
+import PhoneBookList from './Phonebook/PhoneBookList/PhoneBookList';
+import PhoneBookEditor from './Phonebook/PhoneBookEditor/PhoneBookEditor';
+import Filter from './Phonebook/PhoneBookFilter/PhoneBookFilter';
 
 export default function App() {
-  const contacts = useSelector(state => state.contacts.items);
-  const filter = useSelector(state => state.contacts.filter);
-
-  const dispatch = useDispatch();
-
-  const addContacts = (name, number) => {
-    const findName = contacts.find(contact => contact.name === name);
-
-    if (name === '') {
-      customToast(`Field name is empty`, 'error');
-      return;
-    }
-
-    if (number === '') {
-      customToast(`Field number is empty`, 'error');
-      return;
-    }
-
-    if (findName !== undefined) {
-      customToast(
-        `Contact name "${name}" is already in the contact list`,
-        'warning'
-      );
-    } else {
-      const contact = {
-        id: shortid.generate(),
-        name,
-        number,
-      };
-
-      dispatch(contactActions.add(contact));
-      customToast(`Contact "${name}" has been add`, 'success');
-    }
-  };
-
-  const deletePhoneBook = contactsListId => {
-    const updatedCoontacts = contacts.filter(
-      contact => contact.id !== contactsListId
-    );
-    dispatch(contactActions.remove(updatedCoontacts));
-    customToast(`Contact has been deleted`, 'success');
-  };
-
-  const changeFilter = e => {
-    dispatch(contactActions.filter(e.currentTarget.value));
-  };
-
-  const normalizedFilter = filter.toLowerCase();
-  const visibleContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizedFilter)
-  );
+  const {
+    contacts,
+    filter,
+    onAddContacts,
+    onDeletePhoneBook,
+    onChangeFilter,
+    visibleContacts,
+  } = useContacts();
 
   return (
     <PersistGate persistor={persistor} loading={null}>
       <div className={s.Phonebook__container}>
         <h1 className={s.Phonebook__title}>PhoneBook</h1>
-        <PhoneBookEditor onSubmit={addContacts} />
+        <PhoneBookEditor onSubmit={onAddContacts} />
 
         {contacts.length > 0 ? (
           <>
             <p className={s.Contacts__title}>
               There are {contacts.length} contacts in your PhoneBook
             </p>
-            <Filter value={filter} onChange={changeFilter} />
+            <Filter value={filter} onChange={onChangeFilter} />
 
             <PhoneBookList
               contacts={visibleContacts}
-              ondeletePhoneBook={deletePhoneBook}
+              ondeletePhoneBook={onDeletePhoneBook}
             />
             <ToastContainer />
           </>
