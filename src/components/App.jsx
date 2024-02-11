@@ -5,23 +5,20 @@ import Filter from './Phonebook/PhoneBookFilter/PhoneBookFilter';
 import shortid from 'shortid';
 import s from './Container.module.css';
 import { customToast } from './helper';
-import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor } from '../../src/redux/index';
 
 import * as contactActions from '../redux/contacts';
 
 export default function App() {
   const contacts = useSelector(state => state.contacts.items);
   const filter = useSelector(state => state.contacts.filter);
-  console.log('filter ==>', filter);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
 
   const addContacts = (name, number) => {
     const findName = contacts.find(contact => contact.name === name);
@@ -71,28 +68,30 @@ export default function App() {
   );
 
   return (
-    <div className={s.Phonebook__container}>
-      <h1 className={s.Phonebook__title}>PhoneBook</h1>
-      <PhoneBookEditor onSubmit={addContacts} />
+    <PersistGate persistor={persistor} loading={null}>
+      <div className={s.Phonebook__container}>
+        <h1 className={s.Phonebook__title}>PhoneBook</h1>
+        <PhoneBookEditor onSubmit={addContacts} />
 
-      {contacts.length > 0 ? (
-        <>
+        {contacts.length > 0 ? (
+          <>
+            <p className={s.Contacts__title}>
+              There are {contacts.length} contacts in your PhoneBook
+            </p>
+            <Filter value={filter} onChange={changeFilter} />
+
+            <PhoneBookList
+              contacts={visibleContacts}
+              ondeletePhoneBook={deletePhoneBook}
+            />
+            <ToastContainer />
+          </>
+        ) : (
           <p className={s.Contacts__title}>
-            There are {contacts.length} contacts in your PhoneBook
+            The contact book is empty. Add contacts to your phone book.
           </p>
-          <Filter value={filter} onChange={changeFilter} />
-
-          <PhoneBookList
-            contacts={visibleContacts}
-            ondeletePhoneBook={deletePhoneBook}
-          />
-          <ToastContainer />
-        </>
-      ) : (
-        <p className={s.Contacts__title}>
-          The contact book is empty. Add contacts to your phone book.
-        </p>
-      )}
-    </div>
+        )}
+      </div>
+    </PersistGate>
   );
 }

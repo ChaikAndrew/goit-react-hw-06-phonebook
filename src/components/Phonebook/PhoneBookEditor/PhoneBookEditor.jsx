@@ -2,7 +2,6 @@ import { useState } from 'react';
 import s from './PhoneBookEditor.module.css';
 
 function PhoneBookEditor({ onSubmit }) {
-  // const [contacts, setContacts] = useState([]);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
